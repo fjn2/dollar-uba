@@ -1,113 +1,107 @@
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native'
-import { Container, Header, Title, Content, Footer, FooterTab, Button, Left, Right, Body, Icon, Text } from 'native-base';
-import { LineChart, Grid, XAxis, YAxis } from 'react-native-svg-charts'
+import { View, Text, StyleSheet, Image, TouchableHighlight, ScrollView } from 'react-native'
+import { Container } from 'native-base';
+import faker from 'faker';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import ItemDetail from './src/components/ItemDetail'
+import { confirmAction } from './src/services/confirmActionSvc';
+import 'react-native-gesture-handler';
+
+const Stack = createStackNavigator();
 
 
-function getData() {
-  return fetch('http://192.168.0.56:3030')
-    .then((response) => response.json())
-    .then((json) => {
-      return json;
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-}
+const items = new Array(20).fill(' ').map(() => ({
+  id: Math.random(),
+  title: faker.name.findName(),
+  subtitle: faker.hacker.phrase(),
+  image: faker.image.avatar()
+}));
 
-const parseData = (dataFromApi) => {
-  const dollarLine = [];
-  const ubaLine = [];
-  const xAxis = [];
-  Object.keys(dataFromApi).map((key, index) => {
-    if (index % 50 === 0) {
-      xAxis.push(key);
-    }
-
-    dollarLine.push(dataFromApi[key].dollar);
-    ubaLine.push(dataFromApi[key].uba);
-  })
-  return {
-    xAxis,
-    points: [
-    {
-      data: dollarLine,
-      svg:  { stroke: '#8800cc' }
-    }, {
-      data: ubaLine,
-      svg:  { stroke: 'red' }
-    }
-  ]}
-};
-
-const AnatomyExample = () => {
-  const [data, setData] = useState([])
-  const [xAxisData, setXAxisData] = useState([])
-
-
-  useEffect(() => {
-    getData().then(parseData).then(({ points, xAxis }) => {
-      setData(points);
-      setXAxisData(xAxis);
-    })
-  }, []);
-
-  const contentInset = { top: 20, bottom: 20 }
-
+const AnatomyExample = ({ navigation }) => {
   return (
     <Container>
-      <Header>
-        <Left>
-          <Button transparent>
-            <Icon name='menu' />
-          </Button>
-        </Left>
-        <Body>
-          <Title>Header</Title>
-        </Body>
-        <Right />
-      </Header>
-      <Content style={{ height: 200, width: '100%' }}>
-        <YAxis
-          data={[1,2,3]}
-          // contentInset={contentInset}
-          svg={{
-              fill: 'grey',
-              fontSize: 10,
-          }}
-          formatLabel={(value) => {
-            console.log('value', value)
-            return `${value}ºC`
-          }}
-          contentInset={contentInset}
-          // svg={{ fontSize: 10, fill: 'black' }}
-        />
-        <LineChart
-            style={{ height: 200 }}
-            data={data}
-            svg={{ stroke: 'rgb(134, 65, 244)' }}
-            contentInset={contentInset}
-        >
-          <Grid />
-        </LineChart>
-        <XAxis
-          data={xAxisData}
-          formatLabel={(value, index) => {
-            return xAxisData[index];
-          }}
-          contentInset={{ left: 10, right: 10 }}
-          svg={{ fontSize: 10, fill: 'black' }}
-        />
-      </Content>
-      <Footer>
-        <FooterTab>
-          <Button full>
-            <Text>Footer</Text>
-          </Button>
-        </FooterTab>
-      </Footer>
+      <ScrollView style={styles.listContainer}>
+        {items.map(itm => <Card key={itm.id} {...itm} navigation={navigation} />)}
+      </ScrollView>
     </Container>
+  );
+};
+
+const Card = ({title, subtitle, image, navigation }) => {
+  const onCardPressHandler = (event) => {
+    navigation.navigate('ItemDetail', {
+      title, subtitle, image, navigation
+    });
+  }
+  const onCardLongPressHandler = () => {
+    confirmAction()
+  }
+
+  return (
+    <TouchableHighlight onPress={onCardPressHandler} onLongPress={onCardLongPressHandler} underlayColor="green" style={styles.cardContainer}>
+      <View>
+        <View style={styles.cardContent}>
+          <Image
+            style={styles.tinyLogo}
+            source={{
+              uri: image
+            }}
+          />
+          <View style={styles.textContainer}>
+            <Text>
+              {title}
+            </Text>
+            <Text>
+              {subtitle}
+            </Text>
+          </View>
+        </View>
+      </View>
+    </TouchableHighlight>
+  )
+}
+
+const styles = StyleSheet.create({
+  listContainer: {
+    marginTop: 8
+  },
+  tinyLogo: {
+    width: 50,
+    height: 50,
+    margin: 4
+  },
+  textContainer: {
+    margin: 4
+  },
+  cardContainer: {
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.29,
+    shadowRadius: 4.65,
+
+    elevation: 7,
+    margin: 8
+  },
+  cardContent: {
+    flexDirection: 'row',
+    margin: 8
+  }
+});
+
+
+const App = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={AnatomyExample} />
+        <Stack.Screen name="ItemDetail" component={ItemDetail} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
-export default AnatomyExample;
+export default App;
