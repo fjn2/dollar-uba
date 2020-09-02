@@ -28,6 +28,11 @@ const main = () => {
 
   ]).then(consolidate)
 }
+// To test
+//const START_DATE = moment('01-08-2020', 'DD-MM-YYYY')
+//const END_DATE = moment();
+// uba(START_DATE, END_DATE).then(console.log)
+//blue(START_DATE, END_DATE).then(console.log)
 
 module.exports = main;
 
