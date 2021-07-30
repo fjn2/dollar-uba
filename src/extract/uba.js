@@ -7,7 +7,6 @@ const getNodes = data => {
   var doc = new dom().parseFromString(data)
   // var nodes = xpath.select('/html/body/div/div[2]/div/div/div/div/table/tbody', doc)
   var nodes = xpath.select('//div/table/tbody/tr/td', doc)
-
   return nodes.map((node) => node.firstChild.toString())
 };
 
@@ -19,7 +18,6 @@ const formatNodes = (nodes) => {
       value: +(nodes[i + 1].replace(/,/gi, '.'))
     })
   }
-
   return resp;
 }
 

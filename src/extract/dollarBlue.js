@@ -31,7 +31,7 @@ const requestToFalop = (date) => {
 const getNodes = data => {
   var doc = new dom().parseFromString(data)
   const resp = [];
-  var nodes = xpath.select('//div/table/tbody/tr', doc)
+  var nodes = xpath.select('//div/table[@border="1"]/tbody/tr', doc)
   for (let i = 1; i < nodes.length; i++) {
     try {
       resp.push({

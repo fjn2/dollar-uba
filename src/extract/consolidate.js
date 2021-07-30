@@ -1,5 +1,5 @@
 const moment = require('moment');
-const blue = require('./dollarBlue');
+const blue = require('./dollarBlueAmbito');
 const uba = require('./uba');
 
 const consolidate = ([uba, dollar]) => {
@@ -15,11 +15,21 @@ const consolidate = ([uba, dollar]) => {
     resp[key].dollar = val.value
   })
 
+  // complete empty values
+  Object.keys(resp).forEach((key, index) => {
+    const item = resp[key]
+    if (index === 0 && !item.dollar) {
+      item.dollar = 0
+    } else if (!item.dollar) {
+      item.dollar = resp[Object.keys(resp)[index - 1]].dollar
+    }
+  })
+
   return resp;
 }
 
 const main = () => {
-  const START_DATE = moment('01-01-2019', 'DD-MM-YYYY')
+  const START_DATE = moment('01-01-2020', 'DD-MM-YYYY')
   const END_DATE = moment();
 
   return Promise.all([
