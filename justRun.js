@@ -90,6 +90,13 @@ app.get('/', async (req, res) => {
         })
 
         </script>
+        <div>
+          <label>Reference: green -> Dollar blue</label>
+          <br />
+          <label>Reference: steelblue -> UBA</label>
+          <br />
+          <label>Reference: red -> Diference</label>
+        </div>
     </body>
   </html>
   `);
